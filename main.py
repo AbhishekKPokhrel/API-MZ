@@ -169,10 +169,6 @@ class EligibilityCalculator:
         # Ensure the household size columns are treated as strings for the mapping
         df_SMI.columns = df_SMI.columns.astype(str)
 
-        # Debugging: Print the structure and first few rows of df_SMI to check the structure
-        print("df_SMI columns:\n", df_SMI.columns)
-        print("df_SMI head:\n", df_SMI.head())
-
         # Create a dictionary to map the household size values from df_SMI
         smi_dict = df_SMI.set_index('State/Province').to_dict(orient='index')
 
@@ -196,12 +192,9 @@ class EligibilityCalculator:
         # Apply the function to create the 'SMI' column in df
         self.df['SMI'] = self.df.apply(get_smi, axis=1)
 
-        # Debugging: Print the first few rows of the dataframe to check SMI values
-        print("self.df with SMI:\n", self.df[['State/Province', 'household_size', 'SMI']].head())
-
-        # Check for missing SMI values
-        if self.df['SMI'].isna().any():
-            print("Some SMI values are missing. Please verify the state names and household sizes.")
+        # # Check for missing SMI values
+        # if self.df['SMI'].isna().any():
+        #     print("Some SMI values are missing. Please verify the state names and household sizes.")
     
     def adjust_fpl_smi(self):
         global file_path_inputs
@@ -211,10 +204,10 @@ class EligibilityCalculator:
         adj_fpl_dict = df_IncAdj.set_index('State/Province')['FPL'].to_dict()
         adj_smi_dict = df_IncAdj.set_index('State/Province')['SMI'].to_dict()
 
-        # Check for missing values before mapping
-        print("States in self.df['State/Province']: ", self.df['State/Province'].unique())
-        print("Keys in adj_fpl_dict: ", adj_fpl_dict.keys())
-        print("Keys in adj_smi_dict: ", adj_smi_dict.keys())
+        # # Check for missing values before mapping
+        # print("States in self.df['State/Province']: ", self.df['State/Province'].unique())
+        # print("Keys in adj_fpl_dict: ", adj_fpl_dict.keys())
+        # print("Keys in adj_smi_dict: ", adj_smi_dict.keys())
 
         self.df['FPL_Fct'] = self.df['State/Province'].map(adj_fpl_dict)
         self.df['SMI_Fct'] = self.df['State/Province'].map(adj_smi_dict)
@@ -319,3 +312,6 @@ def calculate_eligibility(data: InputData):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+
+# uvicorn main:app --reload
