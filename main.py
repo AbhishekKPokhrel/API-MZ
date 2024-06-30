@@ -12,10 +12,8 @@ app = FastAPI()
 
 # Set up CORS to allow file:// protocol
 origins = [
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-    "file://",
-    "https://api-mz.onrender.com/"
+    "https://api-mz.onrender.com",
+    "file://"
 ]
 
 app.add_middleware(
@@ -26,9 +24,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 logger.info(f"CORS origins: {origins}")
 
 # # Mount the static directory

@@ -173,7 +173,7 @@
             console.log('Input Data:', jsonData); // Log input data
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/calculate_eligibility', {
+                const response = await fetch('https://api-mz.onrender.com/calculate_eligibility', {  // Updated to deployed API URL
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
