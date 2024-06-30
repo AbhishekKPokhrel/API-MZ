@@ -159,39 +159,40 @@
                 <label for="file_path_inputs">File Path Inputs:</label>
                 <input type="text" id="file_path_inputs" name="file_path_inputs" value="Inputs.xlsx" required>
             </div> -->
-            <button type="submit">Calculate Eligibility</button>
+            <button type="button" onclick="calculateEligibility()">Calculate Eligibility</button>
         </form>
         <div class="result" id="result"></div>
     </div>
 
     <script>
-        document.getElementById('eligibility-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const form = event.target;
+        async function calculateEligibility() {
+            const form = document.getElementById('eligibility-form');
             const formData = new FormData(form);
+            const jsonData = Object.fromEntries(formData.entries());
 
-            const data = {
-                num_employees: parseInt(formData.get('num_employees')),
-                hr_min: parseFloat(formData.get('hr_min')),
-                hr_median: parseFloat(formData.get('hr_median')),
-                hr_max: parseFloat(formData.get('hr_max')),
-                state: formData.get('state')
-            };
+            console.log('Input Data:', jsonData); // Log input data
 
             try {
-                const response = await fetch('/calculate_eligibility', {
+                const response = await fetch('http://127.0.0.1:8000/calculate_eligibility', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(jsonData)
                 });
-                const result = await response.json();
-                document.getElementById('result').innerText = `Total Eligible for Child Care: ${result['Total Eligible for Child Care']}\nPercentage of eligible employees: ${result['Percentage of eligible employees']}`;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Received response:', data);
+                    document.getElementById('result').innerText = `Total Eligible for Child Care: ${data['Total Eligible for Child Care']}\nPercentage of eligible employees: ${data['Percentage of eligible employees']}`;
+                } else {
+                    throw new Error('Error calculating eligibility.');
+                }
             } catch (error) {
-                document.getElementById('result').innerText = 'Error calculating eligibility.';
+                console.error('Error:', error);
+                document.getElementById('result').textContent = 'Error calculating eligibility.';
             }
-        });
+        }
     </script>
 </body>
 </html>

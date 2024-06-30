@@ -6,15 +6,29 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import logging
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Global variable for file path
-file_path_inputs = "Inputs.xlsx"
+# Set up CORS to allow file:// protocol
+origins = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "file://"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for testing
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.info(f"CORS origins: {origins}")
 
 # # Mount the static directory
 # app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -24,6 +38,9 @@ logger = logging.getLogger(__name__)
 def read_root():
     return FileResponse('index.html')
 
+
+# Global variable for file path
+file_path_inputs = "Inputs.xlsx"
 
 class InputData(BaseModel):
     num_employees: int
@@ -283,7 +300,7 @@ class EligibilityCalculator:
 @app.post("/calculate_eligibility")
 def calculate_eligibility(data: InputData):
     try:
-        logger.info("Received data: %s", data.json())
+        logger.info("Received data: %s", data.model_dump_json())
 
         calculator = EligibilityCalculator(
             num_employees=data.num_employees,
